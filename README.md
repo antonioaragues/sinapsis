@@ -6,10 +6,12 @@ Based on Andrej Karpathy's [LLM Wiki](https://github.com/karpathy/llm-wiki) patt
 
 ## How it works
 
-You capture raw sources throughout your day — meeting notes, articles, Slack threads, documents. When you're ready, you tell Claude to ingest them. The LLM reads each source, extracts key information, and integrates it into the wiki: creating entity pages, updating timelines, noting decisions, cross-referencing everything. The knowledge is compiled once and kept current.
+You capture raw sources throughout your day — meeting notes, articles, Slack threads, documents. When you're ready, you tell the LLM to ingest them. It reads each source, extracts key information, and integrates it into the wiki: creating entity pages, updating timelines, noting decisions, cross-referencing everything. The knowledge is compiled once and kept current.
+
+Works with **Claude Code** and **Gemini CLI**. The schema file (`CLAUDE.md` / `GEMINI.md`) is symlinked so both stay in sync.
 
 ```
-You (capture) → raw/ → Claude (ingest) → wiki/ → You (query, browse, generate)
+You (capture) → raw/ → LLM (ingest) → wiki/ → You (query, browse, generate)
 ```
 
 Three layers:
@@ -17,15 +19,15 @@ Three layers:
 | Layer | What | Who owns it |
 |-------|------|-------------|
 | `raw/` | Source documents (meeting notes, articles, docs, Slack) | You — immutable |
-| `wiki/` | Structured, interlinked markdown pages | Claude — auto-maintained |
-| `CLAUDE.md` | Schema and conventions governing LLM behavior | Co-evolved |
+| `wiki/` | Structured, interlinked markdown pages | LLM — auto-maintained |
+| `CLAUDE.md` / `GEMINI.md` | Schema and conventions governing LLM behavior | Co-evolved |
 
 ## Getting started
 
 ### Prerequisites
 
 - [Obsidian](https://obsidian.md) (free)
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
+- An LLM CLI: [Claude Code](https://docs.anthropic.com/en/docs/claude-code) or [Gemini CLI](https://github.com/google-gemini/gemini-cli)
 - Git
 
 ### Setup
@@ -58,7 +60,7 @@ Three layers:
    - Date format: `YYYY-MM-DD`
    - Template file location: `templates/daily.md`
 
-6. **Done.** Open Claude Code in the `sinapsis/` directory and start ingesting.
+6. **Done.** Open your LLM CLI (`claude` or `gemini`) in the `sinapsis/` directory and start ingesting.
 
 ## Daily workflow
 
@@ -95,7 +97,7 @@ All templates are available via Templater (`Ctrl/Cmd + T` or the command palette
 
 ### 2. Update (end of day or whenever)
 
-Open Claude Code in the `sinapsis/` directory:
+Open your LLM CLI in the `sinapsis/` directory:
 
 ```
 # The all-in-one command — processes everything new in a single pass
@@ -125,7 +127,7 @@ You can also be more specific:
 > sync google docs
 ```
 
-Claude will:
+The LLM will:
 - Read each source
 - Create/update entity, concept, decision, and comparison pages
 - Maintain cross-references and timelines
@@ -143,7 +145,7 @@ Ask questions against the wiki:
 > Give me a briefing on everything discussed about Feature X in the last 2 weeks
 ```
 
-Claude searches the wiki index, reads relevant pages, and synthesizes an answer with citations. Good answers can be filed back into the wiki as new pages.
+The LLM searches the wiki index, reads relevant pages, and synthesizes an answer with citations. Good answers can be filed back into the wiki as new pages.
 
 ### 4. Generate (on demand)
 
@@ -158,7 +160,7 @@ Outputs go to `outputs/briefings/` or `outputs/slides/` (Marp format).
 
 ### 5. Lint (periodically)
 
-Ask Claude to health-check the wiki:
+Ask the LLM to health-check the wiki:
 
 ```
 > lint the wiki
@@ -172,7 +174,9 @@ Google Docs are "living" documents that change over time. Instead of manually ex
 
 ### Setup
 
-1. **Install the Google Drive MCP server** for Claude Code. Add this to your Claude Code MCP settings (`~/.claude/settings.json` or project-level `.claude/settings.json`):
+1. **Connect Google Drive** to your LLM CLI:
+
+   **Claude Code** — add the Google Drive MCP server to your settings (`~/.claude/settings.json`):
 
    ```json
    {
@@ -185,7 +189,9 @@ Google Docs are "living" documents that change over time. Instead of manually ex
    }
    ```
 
-2. **Authenticate** — the first time Claude accesses Drive, it will prompt you to authorize via OAuth in the browser.
+   **Gemini CLI** — Google Drive access is built-in. Enable it with the `@google-drive` extension in your Gemini settings.
+
+2. **Authenticate** — the first time the LLM accesses Drive, it will prompt you to authorize via OAuth in the browser.
 
 3. **Done.** You can now ingest Google Docs directly by URL or search for them from Drive.
 
@@ -197,7 +203,7 @@ Google Docs are "living" documents that change over time. Instead of manually ex
 > ingest https://docs.google.com/document/d/1abc123.../edit
 ```
 
-Claude reads the doc directly from Drive, creates a local snapshot in `raw/docs/`, processes it through the standard ingest workflow, and registers it for future syncing.
+The LLM reads the doc directly from Drive, creates a local snapshot in `raw/docs/`, processes it through the standard ingest workflow, and registers it for future syncing.
 
 **Search your Drive:**
 
@@ -206,7 +212,7 @@ Claude reads the doc directly from Drive, creates a local snapshot in `raw/docs/
 > find docs modified this week
 ```
 
-Claude searches your Google Drive and presents results. You choose which ones to ingest.
+The LLM searches your Google Drive and presents results. You choose which ones to ingest.
 
 **Sync tracked docs:**
 
@@ -220,7 +226,7 @@ Once a Google Doc is ingested, it's registered in `wiki/gdoc-registry.md`. Sync 
 > sync Q3 Roadmap PRD
 ```
 
-Claude will:
+The LLM will:
 - Re-fetch each registered doc from Drive
 - Compare with the previous snapshot
 - Update source summaries and wiki pages with what changed
@@ -233,7 +239,7 @@ This is ideal for living documents like PRDs, design docs, and roadmaps that evo
 
 ```
 sinapsis/
-├── CLAUDE.md              # Schema — LLM behavior rules and conventions
+├── CLAUDE.md              # Schema — LLM behavior rules and conventions (GEMINI.md is a symlink)
 ├── raw/                   # Your source documents (immutable)
 │   ├── daily/             # Daily notes (scratchpad)
 │   ├── articles/          # Web clips
@@ -280,7 +286,7 @@ All pages use YAML frontmatter (queryable with Dataview) and `[[wikilinks]]` for
 
 The system is designed to be adapted. Key configuration:
 
-- **CLAUDE.md** — the main schema. Modify domains, page templates, workflows, writing style, naming conventions. This is the most important file.
+- **CLAUDE.md** (symlinked as `GEMINI.md`) — the main schema. Modify domains, page templates, workflows, writing style, naming conventions. This is the most important file. Edit `CLAUDE.md` and the symlink keeps `GEMINI.md` in sync automatically.
 - **templates/** — Templater templates for raw source capture. Add new ones for source types specific to your workflow.
 - **.obsidian/** — Obsidian settings. Adjust to your preferences.
 

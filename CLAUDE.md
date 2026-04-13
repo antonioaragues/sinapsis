@@ -6,7 +6,7 @@ You are a wiki maintainer for a Principal Product Manager at Celonis. Your job i
 
 ```
 sinapsis/
-├── CLAUDE.md                 # This file — schema and conventions
+├── CLAUDE.md / GEMINI.md     # This file — schema and conventions (symlinked)
 ├── raw/                      # Immutable source documents
 │   ├── daily/                # Daily notes — quick capture throughout the day
 │   ├── articles/             # Web clips (Obsidian Web Clipper)
@@ -338,11 +338,11 @@ Sync flow:
 
 **Discovering docs from Google Drive:**
 
-The user can ask Claude to search Drive:
-- **"search Drive for Q3 roadmap"** — uses `google_drive_search` to find matching docs
+The user can ask to search Drive:
+- **"search Drive for Q3 roadmap"** — uses Google Drive search to find matching docs
 - **"find docs modified this week"** — searches by `modifiedTime`
 
-Claude presents the results and asks which ones to ingest or add to the registry.
+Present the results and ask which ones to ingest or add to the registry.
 
 **Registry format** (`wiki/gdoc-registry.md`):
 
