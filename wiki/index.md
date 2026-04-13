@@ -15,11 +15,11 @@ Master index of all pages in the knowledge base. Organized by category.
 
 ## Entities
 
-_No entities yet._
+- [[andrej-karpathy]] — AI researcher, educator, creator of the LLM Wiki pattern
 
 ## Concepts
 
-_No concepts yet._
+- [[llm-wiki-pattern]] — Pattern for LLM-maintained personal knowledge bases (RAG alternative)
 
 ## Decisions
 
@@ -31,4 +31,4 @@ _No comparisons yet._
 
 ## Sources
 
-_No sources ingested yet._
+- [[article-karpathy-llm-wiki]] — Karpathy's proposal for persistent LLM-maintained wikis (2026-04-13)

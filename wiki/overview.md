@@ -21,7 +21,7 @@ _No sources ingested yet. This section will cover system design, platform capabi
 
 ## AI Trends
 
-_No sources ingested yet. This section will track industry developments, emerging tools and models, and their implications for Celonis._
+The [[llm-wiki-pattern]] by [[andrej-karpathy]] represents a shift from RAG-based knowledge retrieval to persistent, LLM-maintained knowledge compilation. Key implication: LLMs are moving beyond query-response into sustained knowledge work — maintaining, cross-referencing, and synthesizing information over time. This is the foundational methodology for this knowledge base.
 
 ## Cross-Domain Connections
 
