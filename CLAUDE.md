@@ -312,7 +312,7 @@ Google Docs are "living" sources — they change over time, unlike static raw fi
 When the user provides a Google Doc URL or asks to ingest a doc from Drive:
 
 1. **Fetch** the document content using `google_drive_fetch` with the doc ID.
-2. **Save a snapshot** to `raw/docs/gdoc-{short-name}.md` with frontmatter including `gdoc_id` and `status: ingested`.
+2. **Save a snapshot** to `raw/docs/gdoc-{short-name}.md` with frontmatter including `gdoc_id`.
 3. **Process** using the standard ingest workflow (source summary, entities, concepts, etc.).
 4. **Register** the doc in `wiki/gdoc-registry.md` with its ID, title, and last synced date.
 5. In the source summary page, include `gdoc_id` and `gdoc_last_synced` in the frontmatter.
@@ -351,6 +351,23 @@ Claude presents the results and asks which ones to ingest or add to the registry
 |-------|--------|-------------|-------------|
 | Q3 Roadmap PRD | 1abc123... | [[gdoc-q3-roadmap-prd]] | 2026-04-13 |
 ```
+
+### Update Everything Workflow
+
+The user can trigger a full update with **"update everything"** or **"catch me up"**. This is the unified command that combines all ingest and sync operations in a single pass:
+
+1. **New local files** — scan `raw/` for un-ingested files (same as batch ingest: diff against `wiki/sources/` raw paths). Process each new file.
+2. **Google Docs sync** — read `wiki/gdoc-registry.md`, re-fetch all registered docs from Drive, compare with snapshots, process changes.
+3. **Accumulate** all wiki changes across both steps — avoid duplicate entity/concept page creation.
+4. **Update** index, overview, and log once at the end.
+5. **Report** a unified summary:
+   - New local sources ingested (count + list)
+   - Google Docs synced (changed / unchanged)
+   - Total wiki pages created/updated
+   - Contradictions or notable changes found
+   - Suggested follow-ups
+
+This is designed to be the default end-of-day command: one prompt to process everything new.
 
 ### Briefing Workflow
 

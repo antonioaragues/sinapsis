@@ -93,22 +93,36 @@ For other sources:
 
 All templates are available via Templater (`Ctrl/Cmd + T` or the command palette).
 
-### 2. Ingest (end of day or whenever)
+### 2. Update (end of day or whenever)
 
 Open Claude Code in the `sinapsis/` directory:
 
 ```
-# Ingest everything new at once
+# The all-in-one command — processes everything new in a single pass
+> update everything
+```
+
+This does two things:
+1. Finds new local files in `raw/` that haven't been ingested yet
+2. Re-syncs all tracked Google Docs for changes
+
+You can also be more specific:
+
+```
+# Only new local files
 > ingest all new
 
-# Or just today's captures
+# Only today's captures
 > ingest today
 
-# Or a specific file
+# Only a specific file
 > ingest raw/articles/some-article.md
 
-# Or a specific folder
+# Only a specific folder
 > ingest all new meetings
+
+# Only Google Docs sync
+> sync google docs
 ```
 
 Claude will:
