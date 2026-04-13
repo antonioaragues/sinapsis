@@ -4,7 +4,6 @@ type: feedback
 date: <% tp.date.now("YYYY-MM-DD") %>
 customer: 
 tags: [feedback]
-status: raw
 ---
 
 # <% tp.file.cursor(1) %>

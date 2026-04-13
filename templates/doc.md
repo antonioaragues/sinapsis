@@ -4,7 +4,6 @@ type: doc
 date: <% tp.date.now("YYYY-MM-DD") %>
 author: 
 tags: [doc]
-status: raw
 ---
 
 # <% tp.file.cursor(1) %>

@@ -4,7 +4,6 @@ type: meeting
 date: <% tp.date.now("YYYY-MM-DD") %>
 attendees: []
 tags: [meeting]
-status: raw
 ---
 
 # <% tp.file.cursor(1) %>

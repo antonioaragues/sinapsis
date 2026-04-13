@@ -4,7 +4,6 @@ type: slack
 date: <% tp.date.now("YYYY-MM-DD") %>
 channel: 
 tags: [slack]
-status: raw
 ---
 
 # <% tp.file.cursor(1) %>

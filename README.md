@@ -116,7 +116,6 @@ Claude will:
 - Create/update entity, concept, decision, and comparison pages
 - Maintain cross-references and timelines
 - Update the index and log
-- Mark sources as ingested
 - Give you a summary of everything that changed
 
 ### 3. Query (anytime)

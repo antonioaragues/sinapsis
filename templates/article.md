@@ -5,7 +5,6 @@ date: <% tp.date.now("YYYY-MM-DD") %>
 url: 
 author: 
 tags: [article]
-status: raw
 ---
 
 # <% tp.file.cursor(1) %>
