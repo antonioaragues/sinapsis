@@ -5,7 +5,7 @@ date: 2026-04-13
 url: https://github.com/karpathy/llm-wiki
 author: Andrej Karpathy
 tags: [article, ai, knowledge-management]
-status: raw
+status: ingested
 ---
 
 # LLM Wiki — A Pattern for Personal Knowledge Bases

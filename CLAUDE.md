@@ -212,11 +212,20 @@ raw: "[[raw/path/to/original]]"
 - List of wiki pages created or updated during ingest
 ```
 
+## Source Status Tracking
+
+All raw sources use a `status` field in their YAML frontmatter to track ingest state:
+
+- `status: raw` — not yet ingested (default for all new sources)
+- `status: ingested` — fully processed into the wiki
+
+After successfully ingesting a source, **update its frontmatter** from `status: raw` to `status: ingested`. This enables batch operations.
+
 ## Operations
 
 ### Ingest Workflow
 
-When the user provides a new source to ingest:
+When the user provides a specific source to ingest:
 
 1. **Read** the source document completely.
 2. **Discuss** key takeaways with the user — ask what to emphasize if unclear.
@@ -228,9 +237,26 @@ When the user provides a new source to ingest:
 8. **Update** `wiki/index.md` with any new pages.
 9. **Update** `wiki/overview.md` if the source changes the big picture.
 10. **Append** to `wiki/log.md`.
-11. **Report** to the user: list of pages created/updated, any contradictions found, suggested follow-ups.
+11. **Mark** the raw source as `status: ingested` in its frontmatter.
+12. **Report** to the user: list of pages created/updated, any contradictions found, suggested follow-ups.
 
 A single source typically touches 5-15 wiki pages. Take your time, be thorough.
+
+### Batch Ingest Workflow
+
+The user can trigger batch ingestion with commands like:
+- **"ingest all new"** — process all files under `raw/` with `status: raw`
+- **"ingest today"** — process all `status: raw` files with today's date
+- **"ingest all new articles"** — process all `status: raw` files in `raw/articles/`
+
+Batch ingest flow:
+
+1. **Scan** all markdown files under `raw/` (recursively) and filter by `status: raw` in frontmatter. Apply any additional filters the user specified (date, folder, etc.).
+2. **List** the files found and confirm with the user before proceeding.
+3. **Process each source** using the appropriate ingest workflow (standard or daily note), one at a time.
+4. **Accumulate** wiki changes — entity/concept pages created by earlier sources in the batch should be updated (not duplicated) by later sources.
+5. **Update** index, overview, and log once at the end (not per source) to avoid churn.
+6. **Report** a consolidated summary: total sources processed, total pages created/updated, contradictions found, suggested follow-ups.
 
 ### Daily Note Ingest Workflow
 
