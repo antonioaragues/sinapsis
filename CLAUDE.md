@@ -8,6 +8,7 @@ You are a wiki maintainer for a Principal Product Manager at Celonis. Your job i
 sinapsis/
 ├── CLAUDE.md                 # This file — schema and conventions
 ├── raw/                      # Immutable source documents
+│   ├── daily/                # Daily notes — quick capture throughout the day
 │   ├── articles/             # Web clips (Obsidian Web Clipper)
 │   ├── meetings/             # Transcriptions, meeting notes
 │   ├── docs/                 # PRDs, design docs, internal docs, Google Docs exports
@@ -230,6 +231,24 @@ When the user provides a new source to ingest:
 11. **Report** to the user: list of pages created/updated, any contradictions found, suggested follow-ups.
 
 A single source typically touches 5-15 wiki pages. Take your time, be thorough.
+
+### Daily Note Ingest Workflow
+
+Daily notes (`raw/daily/YYYY-MM-DD.md`) are a special source type. They contain multiple unrelated items captured throughout the day — meeting snippets, Slack highlights, ideas, reading notes. When ingesting a daily note:
+
+1. **Read** the full daily note.
+2. **Identify sections** — each H2 or H3 section is a separate item that may belong to different domains and entities.
+3. **Process each section independently** — a single daily note may produce:
+   - Multiple entity updates (different people, features, teams mentioned in different sections)
+   - New decision records (if a decision was made in a meeting)
+   - New concept pages (if a new idea or trend was noted)
+   - Updates to existing timelines across several entity pages
+4. **Create a single source summary** in `wiki/sources/` named `daily-YYYY-MM-DD.md` that covers all items, organized by section.
+5. **Cross-reference** between sections when they relate to each other.
+6. **Update** index, overview, and log as usual.
+7. **Report** with a per-section breakdown of what was extracted and where it went.
+
+The user may also ask to ingest only a specific section of a daily note (e.g., "ingest the standup section from today's daily"). In that case, process only that section.
 
 ### Query Workflow
 
