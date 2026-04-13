@@ -12,6 +12,7 @@ Master index of all pages in the knowledge base. Organized by category.
 ## Overview
 
 - [[overview]] — High-level synthesis across all domains
+- [[gdoc-registry]] — Tracked Google Docs for periodic sync
 
 ## Entities
 

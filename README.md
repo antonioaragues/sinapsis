@@ -89,7 +89,7 @@ For other sources:
 - **Web articles**: use [Obsidian Web Clipper](https://obsidian.md/clipper) → saves to `raw/articles/`
 - **Meeting transcripts**: paste into `raw/meetings/` using the meeting template (Templater)
 - **Slack threads**: copy-paste into `raw/slack/` using the Slack template
-- **Documents**: export from Google Docs → save to `raw/docs/`
+- **Google Docs**: ingested directly from Drive — no export needed (see [Google Docs integration](#google-docs-integration))
 
 All templates are available via Templater (`Ctrl/Cmd + T` or the command palette).
 
@@ -153,6 +153,69 @@ Ask Claude to health-check the wiki:
 
 Finds contradictions, orphan pages, stale claims, missing cross-references, and gaps.
 
+## Google Docs integration
+
+Google Docs are "living" documents that change over time. Instead of manually exporting them, Sinapsis reads them directly from Google Drive and tracks changes automatically.
+
+### Setup
+
+1. **Install the Google Drive MCP server** for Claude Code. Add this to your Claude Code MCP settings (`~/.claude/settings.json` or project-level `.claude/settings.json`):
+
+   ```json
+   {
+     "mcpServers": {
+       "google-drive": {
+         "type": "url",
+         "url": "https://mcp.google.com/gdrive"
+       }
+     }
+   }
+   ```
+
+2. **Authenticate** — the first time Claude accesses Drive, it will prompt you to authorize via OAuth in the browser.
+
+3. **Done.** You can now ingest Google Docs directly by URL or search for them from Drive.
+
+### Usage
+
+**Ingest a Google Doc by URL:**
+
+```
+> ingest https://docs.google.com/document/d/1abc123.../edit
+```
+
+Claude reads the doc directly from Drive, creates a local snapshot in `raw/docs/`, processes it through the standard ingest workflow, and registers it for future syncing.
+
+**Search your Drive:**
+
+```
+> search Drive for Q3 roadmap
+> find docs modified this week
+```
+
+Claude searches your Google Drive and presents results. You choose which ones to ingest.
+
+**Sync tracked docs:**
+
+Once a Google Doc is ingested, it's registered in `wiki/gdoc-registry.md`. Sync pulls the latest version and processes any changes:
+
+```
+# Sync all tracked Google Docs
+> sync google docs
+
+# Sync a specific doc
+> sync Q3 Roadmap PRD
+```
+
+Claude will:
+- Re-fetch each registered doc from Drive
+- Compare with the previous snapshot
+- Update source summaries and wiki pages with what changed
+- Add timeline entries noting the evolution
+- Skip docs that haven't changed
+
+This is ideal for living documents like PRDs, design docs, and roadmaps that evolve over weeks or months. The wiki tracks the full history of changes.
+
 ## Directory structure
 
 ```
@@ -170,6 +233,7 @@ sinapsis/
 │   ├── index.md           # Master page index
 │   ├── log.md             # Activity log (chronological)
 │   ├── overview.md        # High-level synthesis
+│   ├── gdoc-registry.md   # Tracked Google Docs for sync
 │   ├── entities/          # Products, features, people, teams, companies
 │   ├── concepts/          # Technical concepts, methodologies
 │   ├── decisions/         # Decision records with timelines

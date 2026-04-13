@@ -302,6 +302,55 @@ When the user asks to lint/health-check:
 3. **Fix** issues with user approval.
 4. **Append** to `wiki/log.md`.
 
+### Google Docs Workflow
+
+Google Docs are "living" sources — they change over time, unlike static raw files. They are accessed directly via the Google Drive MCP tools (`google_drive_search` and `google_drive_fetch`) and tracked in `wiki/gdoc-registry.md`.
+
+**First-time ingest of a Google Doc:**
+
+When the user provides a Google Doc URL or asks to ingest a doc from Drive:
+
+1. **Fetch** the document content using `google_drive_fetch` with the doc ID.
+2. **Save a snapshot** to `raw/docs/gdoc-{short-name}.md` with frontmatter including `gdoc_id` and `status: ingested`.
+3. **Process** using the standard ingest workflow (source summary, entities, concepts, etc.).
+4. **Register** the doc in `wiki/gdoc-registry.md` with its ID, title, and last synced date.
+5. In the source summary page, include `gdoc_id` and `gdoc_last_synced` in the frontmatter.
+
+**Syncing previously ingested Google Docs:**
+
+The user can trigger sync with commands like:
+- **"sync google docs"** — re-fetch all docs in the registry and process changes
+- **"sync [doc name]"** — sync a specific registered doc
+
+Sync flow:
+
+1. **Read** `wiki/gdoc-registry.md` to get the list of tracked docs.
+2. **Fetch** each doc (or the specified one) using `google_drive_fetch`.
+3. **Compare** the fetched content with the existing snapshot in `raw/docs/`.
+4. **If changed**:
+   - Overwrite the snapshot in `raw/docs/` with the new content.
+   - Update the source summary in `wiki/sources/` — note what changed and when.
+   - Update affected entity, concept, and decision pages. Add timeline entries noting the change.
+   - Update `gdoc_last_synced` in the registry and source summary frontmatter.
+5. **If unchanged**: skip, note in report.
+6. **Report** which docs changed, what wiki pages were updated, and any contradictions with previous versions.
+
+**Discovering docs from Google Drive:**
+
+The user can ask Claude to search Drive:
+- **"search Drive for Q3 roadmap"** — uses `google_drive_search` to find matching docs
+- **"find docs modified this week"** — searches by `modifiedTime`
+
+Claude presents the results and asks which ones to ingest or add to the registry.
+
+**Registry format** (`wiki/gdoc-registry.md`):
+
+```markdown
+| Title | Doc ID | Source Page | Last Synced |
+|-------|--------|-------------|-------------|
+| Q3 Roadmap PRD | 1abc123... | [[gdoc-q3-roadmap-prd]] | 2026-04-13 |
+```
+
 ### Briefing Workflow
 
 When the user asks for a briefing or output artifact:
@@ -330,7 +379,7 @@ When the user asks for a briefing or output artifact:
 ## Naming Conventions
 
 - **Files**: lowercase, hyphens for spaces. E.g., `process-mining.md`, `celonis-platform.md`
-- **Source summaries**: prefix with source type. E.g., `meeting-2026-04-13-roadmap-review.md`, `article-ai-agents-landscape.md`
+- **Source summaries**: prefix with source type. E.g., `meeting-2026-04-13-roadmap-review.md`, `article-ai-agents-landscape.md`, `gdoc-q3-roadmap-prd.md`
 - **Decisions**: prefix with `decision-`. E.g., `decision-auth-provider.md`
 - **Comparisons**: prefix with `comparison-`. E.g., `comparison-signavio-vs-celonis.md`
 
@@ -344,4 +393,4 @@ Each entry in `wiki/log.md` follows this format for parseability:
 Description of what was done. Pages created: [[page1]], [[page2]]. Pages updated: [[page3]].
 ```
 
-Actions: `ingest`, `query`, `lint`, `briefing`, `update`.
+Actions: `ingest`, `sync`, `query`, `lint`, `briefing`, `update`.
