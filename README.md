@@ -60,7 +60,11 @@ Three layers:
    - Date format: `YYYY-MM-DD`
    - Template file location: `templates/daily.md`
 
-6. **Done.** Open your LLM CLI (`claude` or `gemini`) in the `sinapsis/` directory and start ingesting.
+6. **Install Tasks plugin** (recommended for action items)
+
+   Settings → Community plugins → install **Tasks**. The wiki extracts action items from your sources into [[wiki/action-items.md]] using Tasks plugin syntax.
+
+7. **Done.** Open your LLM CLI (`claude` or `gemini`) in the `sinapsis/` directory and start ingesting.
 
 ## Daily workflow
 
@@ -168,6 +172,70 @@ Ask the LLM to health-check the wiki:
 
 Finds contradictions, orphan pages, stale claims, missing cross-references, and gaps.
 
+## Slash commands
+
+Common operations are available as Claude Code slash commands (in `.claude/commands/`). Type `/` in Claude Code to see the list:
+
+| Command | What it does |
+|---------|--------------|
+| `/update` | Process all new local files + sync Google Docs in one pass |
+| `/ingest-today` | Ingest today's daily note and any other files modified today |
+| `/ingest-new` | Ingest all un-ingested local files in `raw/` |
+| `/sync-docs` | Sync all tracked Google Docs |
+| `/lint` | Health-check the wiki for contradictions, orphans, gaps |
+| `/briefing <topic>` | Generate a briefing on a topic |
+| `/pre-meeting <name>` | Pre-meeting briefing with context, recent activity, talking points |
+| `/weekly-review` | Weekly summary of activity, decisions, open threads |
+| `/action-items` | Show all open action items grouped by due date |
+
+## Action items
+
+Action items are extracted from sources during ingest and written in [Obsidian Tasks plugin](https://publish.obsidian.md/tasks/Introduction) format. They aggregate automatically in [[wiki/action-items.md]].
+
+Format example:
+
+```markdown
+- [ ] Prepare Q3 roadmap deck for board 📅 2026-04-25 👤 @antonio 🔼
+- [x] Review auth refactor RFC ✅ 2026-04-12 👤 @james
+```
+
+The Tasks plugin reads these from anywhere in the vault — source summaries, entity pages, daily notes — and the queries in `wiki/action-items.md` show overdue, this-week, later, and recently-completed views.
+
+Use `/action-items` for a summary across the wiki, or open `wiki/action-items.md` in Obsidian to interact with tasks (check them off, edit due dates, etc.).
+
+## Scheduled sync
+
+Run `update everything` automatically every weekday at 22:00 (configurable).
+
+**Install (macOS, launchd):**
+
+```bash
+./scripts/install-scheduled-sync.sh
+```
+
+This installs a launchd agent that runs `scripts/scheduled-sync.sh` Mon-Fri at 22:00. The script:
+
+1. Runs `/update` non-interactively (Claude Code with `--permission-mode acceptEdits`)
+2. Auto-commits any wiki changes to git
+3. Pushes to remote
+4. Logs everything to `.sync-logs/`
+
+**To run manually:**
+
+```bash
+./scripts/scheduled-sync.sh           # run now
+launchctl start com.sinapsis.scheduled-sync   # trigger via launchd
+```
+
+**To uninstall:**
+
+```bash
+launchctl unload ~/Library/LaunchAgents/com.sinapsis.scheduled-sync.plist
+rm ~/Library/LaunchAgents/com.sinapsis.scheduled-sync.plist
+```
+
+**To change schedule** — edit `scripts/com.sinapsis.scheduled-sync.plist` and reinstall.
+
 ## Google Docs integration
 
 Google Docs are "living" documents that change over time. Instead of manually exporting them, Sinapsis reads them directly from Google Drive and tracks changes automatically.
@@ -240,6 +308,8 @@ This is ideal for living documents like PRDs, design docs, and roadmaps that evo
 ```
 sinapsis/
 ├── CLAUDE.md              # Schema — LLM behavior rules and conventions (GEMINI.md is a symlink)
+├── .claude/commands/      # Custom slash commands for Claude Code
+├── scripts/               # Scheduled sync installer + script
 ├── raw/                   # Your source documents (immutable)
 │   ├── daily/             # Daily notes (scratchpad)
 │   ├── articles/          # Web clips
@@ -252,6 +322,7 @@ sinapsis/
 │   ├── index.md           # Master page index
 │   ├── log.md             # Activity log (chronological)
 │   ├── overview.md        # High-level synthesis
+│   ├── action-items.md    # Aggregated action items (Tasks plugin)
 │   ├── gdoc-registry.md   # Tracked Google Docs for sync
 │   ├── entities/          # Products, features, people, teams, companies
 │   ├── concepts/          # Technical concepts, methodologies

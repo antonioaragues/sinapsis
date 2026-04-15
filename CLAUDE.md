@@ -220,6 +220,39 @@ Instead, tracking works by comparison: every ingested source has a corresponding
 
 This means raw sources can be in **any format** — Web Clipper output, plain text, copy-pasted transcripts, exports with or without frontmatter. The ingest workflow handles whatever it finds.
 
+## Action Items
+
+Action items extracted from sources are written in [Obsidian Tasks plugin](https://publish.obsidian.md/tasks/Introduction) format so they aggregate in `wiki/action-items.md` automatically.
+
+**Format** — single line per task with optional metadata emojis:
+
+```
+- [ ] Task description 📅 2026-04-20 👤 @maria 🔼
+```
+
+Common metadata:
+- `📅 YYYY-MM-DD` — due date
+- `🛫 YYYY-MM-DD` — start date
+- `⏳ YYYY-MM-DD` — scheduled date
+- `🔼` / `🔽` — high / low priority
+- `👤 @name` — owner (custom convention; use `@` mentions which Obsidian also picks up)
+- `#tag` — categorization (e.g., `#feature-x`, `#deal-acme`)
+
+**Where to write tasks:**
+
+1. **Source summary** (`wiki/sources/`) — every ingest must include an `## Action Items` section if the source contains any. List them inline with full metadata.
+2. **Entity pages** — also add the task in the relevant entity page under `## Open Action Items` so it shows in context.
+
+The Tasks plugin queries in `wiki/action-items.md` will aggregate everything automatically.
+
+**Owner convention** — when the source mentions a person, use `@firstname` or `@firstname-lastname`. If unclear, use `@me` for the wiki owner or `@unknown`.
+
+**On ingest, when extracting action items:**
+- Look for explicit "action item", "TODO", "follow-up", "next step" markers
+- Look for assignments ("X will do Y", "Y needs to be done by Friday")
+- Infer owners and due dates from context; if ambiguous, leave the field out rather than guessing
+- Mark items already done as `- [x]` with `✅ YYYY-MM-DD`
+
 ## Operations
 
 ### Ingest Workflow
@@ -368,6 +401,48 @@ The user can trigger a full update with **"update everything"** or **"catch me u
    - Suggested follow-ups
 
 This is designed to be the default end-of-day command: one prompt to process everything new.
+
+### Pre-Meeting Briefing Workflow
+
+When the user asks for a pre-meeting briefing (or invokes `/pre-meeting`), they will provide context like the meeting name, attendees, or topic.
+
+1. **Search the wiki** for relevant context:
+   - Entity pages for any people / teams / customers mentioned (look in `wiki/entities/`)
+   - Decisions related to the topic (`wiki/decisions/`)
+   - Recent source summaries that mention the people or topic
+   - Open action items involving the attendees
+2. **Read** the relevant pages in full.
+3. **Generate** a concise briefing with the following structure:
+
+   ```markdown
+   # Pre-meeting briefing: [meeting name]
+
+   **Date**: YYYY-MM-DD
+   **Attendees**: [if known]
+
+   ## Context
+   What this meeting is about and why it matters now.
+
+   ## Recent activity
+   - Last interactions / decisions / discussions involving these attendees or this topic
+   - Link to source summaries
+
+   ## Open threads
+   - Decisions in flight
+   - Open action items involving attendees (from [[action-items]])
+   - Pending follow-ups from previous meetings
+
+   ## Suggested talking points
+   - 3-5 specific questions or topics to raise based on the wiki state
+
+   ## Risks / watch-outs
+   - Known blockers, contradictions, or sensitivities
+   ```
+
+4. **Save** to `outputs/briefings/pre-meeting-YYYY-MM-DD-{slug}.md`.
+5. **Append** to `wiki/log.md`.
+
+Keep it under one page. Lead with the most actionable info.
 
 ### Briefing Workflow
 
